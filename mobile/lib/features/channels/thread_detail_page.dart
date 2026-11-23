@@ -21,6 +21,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../shared/identity_names/identity_names_provider.dart';
 import '../../shared/mentions/agent_identity_provider.dart';
 import '../../shared/relay/relay.dart';
+import '../../shared/relay/relay_author_provider.dart';
 import '../../shared/theme/theme.dart';
 import '../../shared/widgets/avatar_image.dart';
 import '../../shared/widgets/frosted_app_bar.dart';
@@ -120,6 +121,14 @@ class ThreadDetailPage extends HookConsumerWidget {
     // signing identity instead of freezing that incomplete route snapshot.
     final currentPubkey =
         ref.watch(currentPubkeyProvider) ?? this.currentPubkey;
+    final editOwners =
+        ref.watch(agentOwnersProvider).asData?.value ??
+        const <String, String>{};
+    final relayUrl = ref.watch(relayConfigProvider).baseUrl;
+    final editRelayAuthor = ref
+        .watch(relayAuthorProvider(relayUrl))
+        .asData
+        ?.value;
     // A Solo chat's threads are read-only: its agents answer at top level.
     final canReply =
         isMember &&
@@ -168,6 +177,8 @@ class ThreadDetailPage extends HookConsumerWidget {
         : formatTimeline(
             mergeThreadEvents(replyEvents, liveChannelEvents),
             currentPubkey: currentPubkey,
+            agentOwners: editOwners,
+            relayPubkey: editRelayAuthor,
           );
     final hasFetchedReplies = fetchedReplies != null;
     // A terminal query error cannot produce a more authoritative list. Keep
@@ -184,7 +195,12 @@ class ThreadDetailPage extends HookConsumerWidget {
         ? _provisionalThreadMessages(
             allMessages,
             fetchedReplies ??
-                formatTimeline(liveChannelEvents, currentPubkey: currentPubkey),
+                formatTimeline(
+                  liveChannelEvents,
+                  currentPubkey: currentPubkey,
+                  agentOwners: editOwners,
+                  relayPubkey: editRelayAuthor,
+                ),
             liveChannelEvents,
           )
         : [

@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../shared/channels/saved_message_store.dart';
+import '../../shared/mentions/agent_identity_provider.dart';
 import '../../shared/relay/relay.dart';
+import '../../shared/relay/relay_author_provider.dart';
 import 'channel_event_order.dart';
 import 'pending_local_messages_provider.dart';
 import 'saved_channel_page.dart';
@@ -112,6 +114,12 @@ class ChannelMessagesNotifier extends Notifier<AsyncValue<List<NostrEvent>>> {
   bool get _summaryMounted => ref.mounted;
   RelaySessionNotifier get _summarySession =>
       ref.read(relaySessionProvider.notifier);
+  Map<String, String> get _summaryAgentOwners =>
+      ref.read(agentOwnersProvider).asData?.value ?? const {};
+  String? get _summaryRelayAuthor => ref
+      .read(relayAuthorProvider(ref.read(relayConfigProvider).baseUrl))
+      .asData
+      ?.value;
 
   /// Last successfully loaded messages, preserved across reconnections so the
   /// UI can show stale data instead of a blank loading spinner.

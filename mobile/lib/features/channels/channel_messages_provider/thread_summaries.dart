@@ -153,11 +153,15 @@ extension _ThreadSummaryState on ChannelMessagesNotifier {
     final rows = _visibleNestedRows(root).toList();
     if (rows.isEmpty) return;
     final entries = buildMainTimelineEntries(
-      formatTimeline([
-        ...{
-          for (final event in [...rows, ...replies]) event.id: event,
-        }.values,
-      ]),
+      formatTimeline(
+        [
+          ...{
+            for (final event in [...rows, ...replies]) event.id: event,
+          }.values,
+        ],
+        agentOwners: _summaryAgentOwners,
+        relayPubkey: _summaryRelayAuthor,
+      ),
     );
     for (final row in rows) {
       if ((_threadQueryVersions[row.id] ?? 0) > version) continue;

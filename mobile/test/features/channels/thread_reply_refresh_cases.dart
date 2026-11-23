@@ -11,7 +11,7 @@ void threadReplyRefreshTests() {
     content: 'Refresh root',
   );
   final reply = _textMsg(
-    id: 'cached-reply',
+    id: threadIdR1,
     pubkey: 'bob',
     content: 'Cached reply',
     createdAt: 1001,
@@ -82,7 +82,7 @@ void threadReplyRefreshTests() {
         await tester.pump(const Duration(milliseconds: 16));
         expect(find.text('0 replies'), findsNothing, reason: 'frame $frame');
         expect(
-          find.byKey(const ValueKey('thread-message-group-cached-reply')),
+          find.byKey(const ValueKey('thread-message-group-$threadIdR1')),
           findsOneWidget,
         );
         expect(container.read(threadRepliesProvider(args)).value, [reply]);
@@ -131,7 +131,7 @@ void threadReplyRefreshTests() {
     refresh.completeError(Exception('Refresh failed'));
     await tester.pumpAndSettle();
     expect(
-      find.byKey(const ValueKey('thread-message-group-cached-reply')),
+      find.byKey(const ValueKey('thread-message-group-$threadIdR1')),
       findsOneWidget,
     );
     expect(find.text('0 replies'), findsNothing);
